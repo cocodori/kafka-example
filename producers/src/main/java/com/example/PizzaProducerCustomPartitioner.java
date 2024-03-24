@@ -13,9 +13,9 @@ import java.util.Properties;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
 
-public class PizzaProducer {
+public class PizzaProducerCustomPartitioner {
 
-    private static final Logger logger = LoggerFactory.getLogger(PizzaProducer.class);
+    private static final Logger logger = LoggerFactory.getLogger(PizzaProducerCustomPartitioner.class);
 
     public static void sendMessage(
         KafkaProducer<String, String> producer,
@@ -81,23 +81,24 @@ public class PizzaProducer {
     }
 
     public static void main(String[] args) {
-        String topicName = "pizza-topic";
+        String topicName = "pizza-topic-partitioner";
 
         // KafkaProducer configuration settings
         Properties props = new Properties();
         props.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "192.168.56.2:9092");
         props.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
         props.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
-        props.setProperty(ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION, "6");
+        props.setProperty(ProducerConfig.PARTITIONER_CLASS_CONFIG, CustomPartitioner.class.getName());
+        props.setProperty("custom.specialKey", "P001");
 
         KafkaProducer<String, String> producer = new KafkaProducer<>(props);
         sendMessage(
             producer,
             topicName,
             -1,
-            10,
-            100,
-            100,
+             100,
+            0,
+            0,
             true
         );
 
